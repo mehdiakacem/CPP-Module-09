@@ -6,7 +6,7 @@
 /*   By: makacem <makacem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/18 10:12:56 by makacem           #+#    #+#             */
-/*   Updated: 2023/08/19 16:56:52 by makacem          ###   ########.fr       */
+/*   Updated: 2023/08/19 19:08:32 by makacem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int main(int argc, char **argv)
             {
                 it = map.lower_bound(date);
                 it--;
+                std::cout<<"******"<< it->first <<std::endl;
                 std::cout << date << " => " << value << " = " << value * it->second << std::endl;
             }
         }
