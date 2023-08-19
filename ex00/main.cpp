@@ -6,61 +6,12 @@
 /*   By: makacem <makacem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/18 10:12:56 by makacem           #+#    #+#             */
-/*   Updated: 2023/08/18 19:33:32 by makacem          ###   ########.fr       */
+/*   Updated: 2023/08/19 16:56:52 by makacem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
 
-int ft_check_delimiter(std::string delimiter)
-{
-    if (delimiter.compare("-") != 0)
-        return 1;
-    return 0;
-}
-
-int ft_check_date_format(std::string date)
-{
-    std::string year = date.substr(0, 4);
-    std::string fdelimiter = date.substr (4, 1); 
-    std::string month = date.substr(5, 2);
-    std::string sdelimiter = date.substr (7, 1);    
-    std::string day = date.substr(8);
-
-    if (ft_check_year(year) == 1)
-        return 1;
-    if (ft_check_delimiter(fdelimiter) == 1)
-        return 1;
-
-
-    
-    return 0;
-}
-
-int ft_check_format(std::string line)
-{
-    std::string date;
-    std::string separator;
-    std::string value;
-
-    if (line.size() == 0)
-        return 0;
-    if (line.size() > 13)
-    {
-        date = line.substr(0, 10);
-        separator = line.substr(10, 3);
-        if (ft_check_date_format(date)== 0)
-        {
-            value = line.substr(13);
-        }
-        else
-            return(ft_return_bad_input(line));
-    }
-    else
-        return(ft_return_bad_input(line));
-    
-    return 0;
-}
 
 int main(int argc, char **argv)
 {
@@ -70,6 +21,25 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    std::fstream DataFile;
+    DataFile.open("data.csv", std::ios::in);
+    if (!DataFile)
+    {
+        std::cout << "Error: could not open datafile.\n";
+        return 1;
+    }
+    std::string line;
+    std::map<std::string, float> map;
+    std::getline(DataFile, line);
+    std::string date;
+    float exchange_rate;
+    while (std::getline(DataFile, line))
+    {
+        date = line.substr(0, 10);
+        exchange_rate = std::stof(line.substr(11));
+        map[date] = exchange_rate;
+    }
+ 
     std::fstream InputFile;
     InputFile.open(*(argv + 1), std::ios::in);
     if (!InputFile)
@@ -77,19 +47,31 @@ int main(int argc, char **argv)
         std::cout << "Error: could not open file.\n";
         return 1;
     }
-    
-    std::string line;
+
+    std::map<std::string, float>::iterator it;
     std::getline(InputFile, line);
+    float value;
     while (std::getline(InputFile, line))
     {
         if (ft_check_format(line) == 0)
         {
-            std::cout << line << std::endl;
+            date = line.substr(0, 10);
+            value = std::stof(line.substr(13));
+            it = map.find(date);
+            if (it != map.end())
+                std::cout << date << " => " << value << " = " << value * map.find(date)->second << std::endl;
+            else
+            {
+                it = map.lower_bound(date);
+                it--;
+                std::cout << date << " => " << value << " = " << value * it->second << std::endl;
+            }
         }
         
     }
     
     InputFile.close();
+    DataFile.close();
     
     return 0;
 }
