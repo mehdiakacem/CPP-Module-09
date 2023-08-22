@@ -6,7 +6,7 @@
 /*   By: makacem <makacem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 12:55:17 by makacem           #+#    #+#             */
-/*   Updated: 2023/08/21 22:26:17 by makacem          ###   ########.fr       */
+/*   Updated: 2023/08/22 09:53:54 by makacem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,10 +98,15 @@ int main(int argc, char **argv)
     std::chrono::microseconds durationMicro = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << "Time to process a range of "<< arguments.size() << " elements with std::vector:  " << durationMicro.count() << " us\n";
     
+
+
+
+
+    
     //using a list//
 
     std::list<int> arguments_list;
-    std::string arg;
+    std::string argforlist;
 
     try
     {
@@ -109,10 +114,10 @@ int main(int argc, char **argv)
             return (ft_invalid_arguments());
         for (int i = 1; i < argc; i++)
         {
-            arg = *(argv + i);
-            if (ft_isnotnbr(arg))
+            argforlist = *(argv + i);
+            if (ft_isnotnbr(argforlist))
                 return (ft_invalid_arguments());
-            arguments_list.push_back(std::stoi(arg));
+            arguments_list.push_back(std::stoi(argforlist));
         }
     }
     catch(const std::exception& e)
@@ -121,6 +126,7 @@ int main(int argc, char **argv)
         std::cerr << e.what() << '\n';
         return 1;
     }
+    
     std::list<std::pair<int, int> > pairList;
     // Finish converting to list;
     std::list<int>::iterator it_argumentsList = arguments_list.begin();
@@ -128,20 +134,24 @@ int main(int argc, char **argv)
     std::chrono::high_resolution_clock::time_point startinList = std::chrono::high_resolution_clock::now();
     while (it_argumentsList != arguments_list.end())
     {
-        if (it_argumentsList + 1 != arguments_list.end())
+        int first = *it_argumentsList;
+        it_argumentsList++;
+        if (it_argumentsList  != arguments_list.end())
         {
-            int first = *it_argumentsList;
-            int second = *(it_argumentsList + 1);
-            pairVector.push_back(std::make_pair(first, second));
-            it_argumentsList = it_argumentsList + 2;
+            int second = *it_argumentsList;
+            pairList.push_back(std::make_pair(first, second));
+            it_argumentsList++;
+            
         }
         else
         {
-            last = *it_argumentsList;
-            it_argumentsList++;            
+            it_argumentsList--;
+            last_inList = *it_argumentsList;
+            it_argumentsList++;
         }
     }
-    for (std::vector<std::pair<int, int> >::iterator it = pairVector.begin(); it != pairVector.end(); it++)
+
+    for (std::list<std::pair<int, int> >::iterator it = pairList.begin(); it != pairList.end(); it++)
     {
         if (it->first > it->second)
         {
@@ -151,34 +161,34 @@ int main(int argc, char **argv)
             it->second = temp;
         }
     }
-    std::vector<int> first_vector;
-    std::vector<int> second_vetor;
 
-    for (std::vector<std::pair<int, int> >::iterator it = pairVector.begin(); it != pairVector.end(); it++)
+    std::list<int> first_list;
+    std::list<int> second_list;
+
+    for (std::list<std::pair<int, int> >::iterator it = pairList.begin(); it != pairList.end(); it++)
     {
-        first_vector.push_back(it->first);
-        second_vetor.push_back(it->second);
+        first_list.push_back(it->first);
+        second_list.push_back(it->second);
     }
-    mergeSort(second_vetor);
-    for(std::vector<int>::iterator it_first = first_vector.begin(); it_first != first_vector.end(); it_first++)
+    mergeSortList(second_list);
+    for(std::list<int>::iterator it_first = first_list.begin(); it_first != first_list.end(); it_first++)
     {
         int nbr = *it_first;
-        std::vector<int>::iterator low = std::lower_bound(second_vetor.begin(), second_vetor.end(), nbr);
-        second_vetor.insert(low, nbr);
+        std::list<int>::iterator low = std::lower_bound(second_list.begin(), second_list.end(), nbr);
+        second_list.insert(low, nbr);
     }
+
     if (arguments.size() % 2 == 1)
     {
-        std::vector<int>::iterator it_last = arguments.end();
+        std::list<int>::iterator it_last = arguments_list.end();
         it_last--;
         int last = *it_last;
-        std::vector<int>::iterator low = std::lower_bound(second_vetor.begin(), second_vetor.end(), last);
-        second_vetor.insert(low, last);
+        std::list<int>::iterator low = std::lower_bound(second_list.begin(), second_list.end(), last);
+        second_list.insert(low, last);
     }
-    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-    std::cout << "After:\t";
-    ft_pring_vector(second_vetor);
-    std::chrono::microseconds durationMicro = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Time to process a range of "<< arguments.size() << " elements with std::vector:  " << durationMicro.count() << " us\n";
+    std::chrono::high_resolution_clock::time_point endinList = std::chrono::high_resolution_clock::now();
+    std::chrono::microseconds durationMicroinList = std::chrono::duration_cast<std::chrono::microseconds>(endinList - startinList);
+    std::cout << "Time to process a range of "<< arguments.size() << " elements with std::list:  " << durationMicroinList.count() << " us\n";
 
     return 0;
 }
